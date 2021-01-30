@@ -22,9 +22,9 @@ public class InputHandler : MonoBehaviour {
     }
 
     void Update() {
-        if (PlayerCharacter.Instance.PlayerState == PlayerState.Dead) { //TODO: Just change this to dead, or add a Dead state
-            return;
-        }
+        //if (PlayerCharacter.Instance.PlayerState == PlayerState.Dead) { //TODO: Just change this to dead, or add a Dead state
+        //    return;
+        //}
         if (_player.GetButtonDown("Pause")) {
             GameLoop.Instance.Pause();
             return;

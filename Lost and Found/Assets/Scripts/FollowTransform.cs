@@ -22,7 +22,11 @@ public class FollowTransform : MonoBehaviour {
         transform.position = FollowTarget.position + _offset;
 
         if (FollowRotation) {
-            transform.rotation = FollowTarget.rotation;
+            //var currentRotation = transform.eulerAngles;
+            //currentRotation.x = Mathf.Lerp(currentRotation.x, PlayerCharacter.Instance.transform.rotation.x, Time.deltaTime);
+            //transform.eulerAngles = currentRotation;
+            //LerpCamera();
+
         }
     }
 

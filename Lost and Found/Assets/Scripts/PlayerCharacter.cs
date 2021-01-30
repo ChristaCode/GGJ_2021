@@ -29,6 +29,7 @@ public class PlayerCharacter : MonoBehaviour {
     [SerializeField] private LayerMask _raycastIgnoredLayersGrounded;
     [SerializeField] private LayerMask _raycastIgnoredLayersCrash;
 
+    public Vector3 UprightRotation;
     public bool Grounded = true;
     public bool Idle = false;
 
@@ -97,7 +98,8 @@ public class PlayerCharacter : MonoBehaviour {
                 Grounded = true;
             }
             else {
-               GroundedMovement(hit.normal);
+                UprightRotation = hit.normal;
+               GroundedMovement(UprightRotation);
             }
         }
         else {
@@ -154,7 +156,7 @@ public class PlayerCharacter : MonoBehaviour {
             }
         }
 
-        var rot = Quaternion.FromToRotation(transform.up, uprightRot) * transform.rotation;       //WORKING AT THIS POINT
+        var rot = Quaternion.FromToRotation(transform.up, uprightRot) * transform.rotation;       //add this to align to surface
         transform.rotation = rot;
                                                                                                 
         _rb.velocity = transform.forward * _runSpeed * InputDirection.magnitude;
