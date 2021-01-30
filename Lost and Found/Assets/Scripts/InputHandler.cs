@@ -30,7 +30,7 @@ public class InputHandler : MonoBehaviour {
             return;
         }
 
-        _myPlayerController.InputDirection = new Vector3(_player.GetAxis("Move Horizontal"), 0, _player.GetAxis("Move Vertical")).normalized; //TODO: normalising makes speed consistent across directions, but removes input graduation
+        _myPlayerController.InputDirection = new Vector3(_player.GetAxis("Move Horizontal"), 0, _player.GetAxis("Move Vertical")); //TODO: normalising makes speed consistent across directions, but removes input graduation
 
         var camRotationX = _player.GetAxis("Look Horizontal");
         var camRotationY = _player.GetAxis("Look Vertical");
@@ -43,36 +43,9 @@ public class InputHandler : MonoBehaviour {
             CamBeingMovedByPlayer = false;
         }
 
-        if (_player.GetButton("Jump")) {
-            JumpCharge += Time.deltaTime;
-        }
-
         if (_player.GetButtonUp("Jump")) {
-            _myPlayerController.Jump(JumpCharge);
-            JumpCharge = 0f;
+            print("JUMP!");
+            _myPlayerController.Jump();
         }
-
-        if (_player.GetButtonDown("Attack Hands")) {
-            if (_myPlayerController.Grounded) {
-                _myPlayerController.AttackPunch();
-            }            
-        }
-
-        if (_player.GetButtonDown("Attack Feet")) {
-            if (_myPlayerController.Grounded) {
-                _myPlayerController.AttackKick();
-            }
-        }
-
-        if (!_myPlayerController.Grounded) {
-            if (_player.GetAxis("Spin Left") != 0) {
-                float inputPressure = _player.GetAxis("Spin Left");
-                _myPlayerController.SpinHorizontal(inputPressure);
-            }
-            else if (_player.GetAxis("Spin Right") != 0) {
-                float inputPressue = _player.GetAxis("Spin Right");
-                _myPlayerController.SpinHorizontal(inputPressue);
-            }            
-        }                
     }
 }

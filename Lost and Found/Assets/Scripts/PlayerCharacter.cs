@@ -32,9 +32,8 @@ public class PlayerCharacter : MonoBehaviour {
     public bool Grounded = true;
     public bool Idle = false;
 
-    //private Animator _anim;
+    [SerializeField] private Animator _anim;
     [SerializeField] private Rigidbody _rb;
-    [SerializeField] private CharacterController _charController;
            
     [Space]
     //[Range(0.0001f, 0.1f)]
@@ -60,10 +59,11 @@ public class PlayerCharacter : MonoBehaviour {
     private float _airbourneRagdollCollisionForce = 3f;
     private Coroutine _lastLerpRoutine = null;
 
+    private const float GRAVITY = 9.81f;
+
+
     void Start() {
         Instance = this;
-        //_anim = GetComponent<Animator>();
-        _charController = GetComponent<CharacterController>();
 
         if (_goToStart) {
             ResetPlayerCharacter();
@@ -73,35 +73,50 @@ public class PlayerCharacter : MonoBehaviour {
     void Update() {
         CurrentVelocity = _rb.velocity;
         _currentVelocityMagnitude = _rb.velocity.magnitude;
-        //_anim.SetFloat("velocity", InputDirection.magnitude);
-
+        _anim.SetFloat("Velocity", InputDirection.magnitude);
+        
         GroundedCheck();
 
         if (Grounded) {
-            GroundedMovement();
+            _rb.AddForce(-transform.up * GRAVITY);
         }
         else {
-            AirbourneMovement();
+            _rb.AddForce(-Vector3.up * GRAVITY);
         }
+        
     }
 
     void GroundedCheck() {
         RaycastHit hit;
 
-        Debug.DrawRay(transform.position + Vector3.up * _groundCheckOffset, Vector3.down * _groundCheckDistance, Color.blue);
+        Debug.DrawRay(transform.position + transform.up * _groundCheckOffset, -transform.up * _groundCheckDistance, Color.blue);
 
-        if (Physics.Raycast(transform.position + Vector3.up * _groundCheckOffset, Vector3.down, out hit, _groundCheckDistance, ~_raycastIgnoredLayersGrounded)) {
+        if (Physics.Raycast(transform.position + transform.up * _groundCheckOffset, -transform.up, out hit, _groundCheckDistance, ~_raycastIgnoredLayersGrounded)) {        //for climbing
             if (!Grounded) {
                 Land();
                 Grounded = true;
             }
+            else {
+               GroundedMovement(hit.normal);
+            }
         }
         else {
             if (Grounded) {
+                _anim.SetBool("GroundedAndUpright", false);
                 Grounded = false;
             }
         }
-    }     
+
+        if (!Grounded && Vector3.Dot(transform.up, Vector3.up) < 1) {           //if we're neither upright nor grounded
+            LevelOut(1f);            
+        }
+        else if (Grounded && Vector3.Dot(transform.up, Vector3.up) == 1) {      //if we're grounded and upright
+            _anim.SetBool("GroundedAndUpright", true);                                           
+        }
+        else if (Grounded && Vector3.Dot(transform.up, Vector3.up) < 1) {       //if grounded but not upright
+            _anim.SetBool("GroundedAndUpright", false);      
+        }
+    }
 
     private void StartSpeedChange(float duration, float targetForce, float forceAtStateChange) {
         if (_lastLerpRoutine != null) {
@@ -118,10 +133,10 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
 
-    public void GroundedMovement() {
+    public void GroundedMovement(Vector3 uprightRot) {
         Vector3 camDirection = Camera.main.transform.rotation * InputDirection;                //this takes all 3 axes (good for something flying in 3d space)           
         Vector3 targetDirection = new Vector3(camDirection.x, 0, camDirection.z);              //add this line if the character moves along the ground
-
+        
         if (InputDirection != Vector3.zero) {                                                  //turn the character to face the direction of travel when there is input
             transform.rotation = Quaternion.Slerp(
                                 transform.rotation,
@@ -132,7 +147,6 @@ public class PlayerCharacter : MonoBehaviour {
             if (PlayerState != PlayerState.Running) {
                 PlayerState = PlayerState.Running;
             }
-
         }
         else {
             if (PlayerState == PlayerState.Running) {
@@ -140,8 +154,10 @@ public class PlayerCharacter : MonoBehaviour {
             }
         }
 
-        _rb.velocity = targetDirection * _runSpeed * InputDirection.magnitude;     //use camDirection here instead of targetDirection if you want a flying character. normalized prevents char moving at double speed diagonally
-
+        var rot = Quaternion.FromToRotation(transform.up, uprightRot) * transform.rotation;       //WORKING AT THIS POINT
+        transform.rotation = rot;
+                                                                                                
+        _rb.velocity = transform.forward * _runSpeed * InputDirection.magnitude;
     }
     
     public void AirbourneMovement() {
@@ -159,14 +175,8 @@ public class PlayerCharacter : MonoBehaviour {
         }
     }
 
-    public void Jump(float jumpCharge) {
-        if(jumpCharge < 1) {
-            jumpCharge = 1;
-        }
-
-        print("jumpCharge is " + jumpCharge);
-        _rb.velocity = new Vector3(0, _baseJumpPower * jumpCharge, _baseJumpPower * jumpCharge);
-        _rb.AddTorque(0, _baseJumpPower * jumpCharge, 0);
+    public void Jump() {        
+        _rb.AddForce(transform.up * _baseJumpPower + transform.forward * _baseJumpPower);
     }
 
     private void FaceDirectionOfVelocity() {
@@ -235,8 +245,8 @@ public class PlayerCharacter : MonoBehaviour {
         float relVelocity = other.relativeVelocity.magnitude;
 
         if (relVelocity >= velocityToRagdoll) {
-            PlayerHealth.Instance.AdjustHealth(-relVelocity * 3);
-            Crash();
+            //PlayerHealth.Instance.AdjustHealth(-relVelocity * 3);
+            //Crash();
         }        
     }
 

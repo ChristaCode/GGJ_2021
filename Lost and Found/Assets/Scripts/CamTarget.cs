@@ -12,7 +12,6 @@ public class CamTarget : MonoBehaviour {
     public void OrbitCamera(float inputX, float inputY) {
         transform.rotation *= Quaternion.AngleAxis(inputX * _rotationSpeed, Vector3.up);
         transform.rotation *= Quaternion.AngleAxis(-inputY * _rotationSpeed, Vector3.right);
-        //transform.Rotate(inputY * _rotationSpeed * Time.deltaTime, inputX * _rotationSpeed * Time.deltaTime, 0);
 
         var angles = transform.localEulerAngles;
         angles.z = 0;

@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Domino Room.unity
+    path: Assets/Scenes/Level.unity
     guid: a8c5aba392d8faa4b92e238b2805c676
   m_configObjects: {}
