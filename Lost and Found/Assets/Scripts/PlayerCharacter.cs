@@ -32,7 +32,7 @@ public class PlayerCharacter : MonoBehaviour {
     public bool Grounded = true;
     public bool Idle = false;
 
-    private Animator _anim;
+    //private Animator _anim;
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private CharacterController _charController;
            
@@ -62,7 +62,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     void Start() {
         Instance = this;
-        _anim = GetComponent<Animator>();
+        //_anim = GetComponent<Animator>();
         _charController = GetComponent<CharacterController>();
 
         if (_goToStart) {
@@ -73,7 +73,7 @@ public class PlayerCharacter : MonoBehaviour {
     void Update() {
         CurrentVelocity = _rb.velocity;
         _currentVelocityMagnitude = _rb.velocity.magnitude;
-        _anim.SetFloat("velocity", InputDirection.magnitude);
+        //_anim.SetFloat("velocity", InputDirection.magnitude);
 
         GroundedCheck();
 
@@ -140,7 +140,7 @@ public class PlayerCharacter : MonoBehaviour {
             }
         }
 
-        _charController.Move(targetDirection * _runSpeed * InputDirection.magnitude);     //use camDirection here instead of targetDirection if you want a flying character. normalized prevents char moving at double speed diagonally
+        _rb.velocity = targetDirection * _runSpeed * InputDirection.magnitude;     //use camDirection here instead of targetDirection if you want a flying character. normalized prevents char moving at double speed diagonally
 
     }
     
@@ -189,20 +189,20 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         Grounded = false;
-        _anim.SetBool("IsGrounded", false);
-        _anim.SetBool("IsFlying", true);
-        _anim.SetTrigger("Hit");
+        //_anim.SetBool("IsGrounded", false);
+       // _anim.SetBool("IsFlying", true);
+      //  _anim.SetTrigger("Hit");
 
         PlayerState = PlayerState.Falling;
     }
 
     public void Land() {
 
-        _anim.SetBool("IsGrounded", true);
-        _anim.SetBool("IsFlying", false);
-        _anim.SetFloat("Forward", 0);
-        _anim.SetFloat("Velocity", 1);
-
+       // _anim.SetBool("IsGrounded", true);
+      //  _anim.SetBool("IsFlying", false);
+      //  _anim.SetFloat("Forward", 0);
+      //  _anim.SetFloat("Velocity", 1);
+//
         _rb.velocity = Vector3.zero;    //TODO: make a nicer transition to land eventually. See if this fixes bump on landing
         _flightTime = 0;
         _rb.mass = 1f;
@@ -219,7 +219,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     public void IsHit() {
-        _anim.SetTrigger("Hit");
+       // _anim.SetTrigger("Hit");
     }
 
     void OnCollisionEnter(Collision other) {
@@ -242,7 +242,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     public void Dead() {
         PlayerState = PlayerState.Dead;
-        //GameLoop.Instance.Died();
+        GameLoop.Instance.Died();
     }
 
     public void ResetPlayerCharacter() {

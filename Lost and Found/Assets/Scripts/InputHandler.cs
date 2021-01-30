@@ -26,7 +26,7 @@ public class InputHandler : MonoBehaviour {
             return;
         }
         if (_player.GetButtonDown("Pause")) {
-            //GameLoop.Instance.Pause();
+            GameLoop.Instance.Pause();
             return;
         }
 
